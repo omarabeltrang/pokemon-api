@@ -1,0 +1,357 @@
+{
+  "info": {
+    "name": "Pokémon API - validaciones requeridas",
+    "description": "Colección parametrizable. Ajustar baseUrl, rutaPokemon, pokemonBaseJson y nombres de campos conforme al código real antes de ejecutar. No contiene pruebas ejecutadas ni capturas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "rutaPokemon",
+      "value": "/pokemon",
+      "type": "string"
+    },
+    {
+      "key": "pokemonBaseJson",
+      "value": "{\"nombre\": \"Pikachu\", \"tipo\": \"electrico\", \"nivel\": 25, \"correo\": \"validaciones.ok.20261122@example.com\", \"fechaCaptura\": \"2026-11-20\"}",
+      "type": "string"
+    },
+    {
+      "key": "campoCorreo",
+      "value": "correo",
+      "type": "string"
+    },
+    {
+      "key": "campoNivel",
+      "value": "nivel",
+      "type": "string"
+    },
+    {
+      "key": "campoFecha",
+      "value": "fechaCaptura",
+      "type": "string"
+    },
+    {
+      "key": "idCreado",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Correo inválido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}{{rutaPokemon}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{rutaPokemon}}"
+          ]
+        },
+        "description": "Debe rechazar correo con formato incorrecto. Esperado 400 o 422.",
+        "body": {
+          "mode": "raw",
+          "raw": "{{payloadPrueba}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const raw = pm.collectionVariables.get(\"pokemonBaseJson\");",
+              "let pokemon;",
+              "try {",
+              "  pokemon = JSON.parse(raw);",
+              "} catch (error) {",
+              "  throw new Error(\"Configura pokemonBaseJson como JSON válido: \" + error.message);",
+              "}",
+              "const correo = pm.collectionVariables.get(\"campoCorreo\");",
+              "const nivel = pm.collectionVariables.get(\"campoNivel\");",
+              "const fecha = pm.collectionVariables.get(\"campoFecha\");",
+              "if (!correo || !nivel || !fecha) throw new Error(\"Configura campoCorreo, campoNivel y campoFecha\");",
+              "pokemon[correo] = \"correo-sin-arroba\";",
+              "pokemon[nivel] = 25;",
+              "pokemon[fecha] = \"2026-11-20\";",
+              "pm.variables.set(\"payloadPrueba\", JSON.stringify(pokemon, null, 2));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazo HTTP 400 o 422\", () => {",
+              "  pm.expect([400, 422]).to.include(pm.response.code);",
+              "});",
+              "pm.test(\"La respuesta no confirma una creación\", () => {",
+              "  pm.expect([200, 201]).not.to.include(pm.response.code);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Nivel 150",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}{{rutaPokemon}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{rutaPokemon}}"
+          ]
+        },
+        "description": "Debe rechazar nivel 150. Esperado 400 o 422.",
+        "body": {
+          "mode": "raw",
+          "raw": "{{payloadPrueba}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const raw = pm.collectionVariables.get(\"pokemonBaseJson\");",
+              "let pokemon;",
+              "try {",
+              "  pokemon = JSON.parse(raw);",
+              "} catch (error) {",
+              "  throw new Error(\"Configura pokemonBaseJson como JSON válido: \" + error.message);",
+              "}",
+              "const correo = pm.collectionVariables.get(\"campoCorreo\");",
+              "const nivel = pm.collectionVariables.get(\"campoNivel\");",
+              "const fecha = pm.collectionVariables.get(\"campoFecha\");",
+              "if (!correo || !nivel || !fecha) throw new Error(\"Configura campoCorreo, campoNivel y campoFecha\");",
+              "pokemon[correo] = \"validaciones.nivel.20261122@example.com\";",
+              "pokemon[nivel] = 150;",
+              "pokemon[fecha] = \"2026-11-20\";",
+              "pm.variables.set(\"payloadPrueba\", JSON.stringify(pokemon, null, 2));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazo HTTP 400 o 422\", () => {",
+              "  pm.expect([400, 422]).to.include(pm.response.code);",
+              "});",
+              "pm.test(\"La respuesta no confirma una creación\", () => {",
+              "  pm.expect([200, 201]).not.to.include(pm.response.code);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Fecha de captura 2050",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}{{rutaPokemon}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{rutaPokemon}}"
+          ]
+        },
+        "description": "Debe rechazar fecha futura. Esperado 400 o 422.",
+        "body": {
+          "mode": "raw",
+          "raw": "{{payloadPrueba}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const raw = pm.collectionVariables.get(\"pokemonBaseJson\");",
+              "let pokemon;",
+              "try {",
+              "  pokemon = JSON.parse(raw);",
+              "} catch (error) {",
+              "  throw new Error(\"Configura pokemonBaseJson como JSON válido: \" + error.message);",
+              "}",
+              "const correo = pm.collectionVariables.get(\"campoCorreo\");",
+              "const nivel = pm.collectionVariables.get(\"campoNivel\");",
+              "const fecha = pm.collectionVariables.get(\"campoFecha\");",
+              "if (!correo || !nivel || !fecha) throw new Error(\"Configura campoCorreo, campoNivel y campoFecha\");",
+              "pokemon[correo] = \"validaciones.fecha.20261122@example.com\";",
+              "pokemon[nivel] = 25;",
+              "pokemon[fecha] = \"2050-01-01\";",
+              "pm.variables.set(\"payloadPrueba\", JSON.stringify(pokemon, null, 2));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazo HTTP 400 o 422\", () => {",
+              "  pm.expect([400, 422]).to.include(pm.response.code);",
+              "});",
+              "pm.test(\"La respuesta no confirma una creación\", () => {",
+              "  pm.expect([200, 201]).not.to.include(pm.response.code);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Buscar ID 9999",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}{{rutaPokemon}}/9999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{rutaPokemon}}",
+            "9999"
+          ]
+        },
+        "description": "Debe devolver 404 si el registro no existe."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Pokémon 9999 inexistente: HTTP 404\", () => {",
+              "  pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Pokémon válido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}{{rutaPokemon}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{rutaPokemon}}"
+          ]
+        },
+        "description": "Debe crear el Pokémon con datos válidos. Esperado 200 o 201.",
+        "body": {
+          "mode": "raw",
+          "raw": "{{payloadPrueba}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const raw = pm.collectionVariables.get(\"pokemonBaseJson\");",
+              "let pokemon;",
+              "try {",
+              "  pokemon = JSON.parse(raw);",
+              "} catch (error) {",
+              "  throw new Error(\"Configura pokemonBaseJson como JSON válido: \" + error.message);",
+              "}",
+              "const correo = pm.collectionVariables.get(\"campoCorreo\");",
+              "const nivel = pm.collectionVariables.get(\"campoNivel\");",
+              "const fecha = pm.collectionVariables.get(\"campoFecha\");",
+              "if (!correo || !nivel || !fecha) throw new Error(\"Configura campoCorreo, campoNivel y campoFecha\");",
+              "pokemon[correo] = \"validaciones.ok.20261122@example.com\";",
+              "pokemon[nivel] = 25;",
+              "pokemon[fecha] = \"2026-11-20\";",
+              "pm.variables.set(\"payloadPrueba\", JSON.stringify(pokemon, null, 2));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Creación exitosa HTTP 200 o 201\", () => {",
+              "  pm.expect([200, 201]).to.include(pm.response.code);",
+              "});",
+              "try {",
+              "  const response = pm.response.json();",
+              "  if (response.id !== undefined) pm.collectionVariables.set(\"idCreado\", String(response.id));",
+              "} catch (e) { /* La API puede devolver éxito sin JSON. */ }"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
