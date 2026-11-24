@@ -1,0 +1,297 @@
+{
+    "info": {
+        "name": "Pokemon API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8080"
+        },
+        {
+            "key": "pokemonId",
+            "value": "1"
+        }
+    ],
+    "item": [
+        {
+            "name": "Crear Pokemon",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/pokemones",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "pokemones"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"nombre\": \"Pikachu\",\n    \"tipo\": \"Electrico\",\n    \"nivel\": 10,\n    \"ataque\": 55,\n    \"defensa\": 40,\n    \"descripcion\": \"Pokemon de tipo electrico\",\n    \"imagenUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Estado 201\", function () {",
+                            "    pm.response.to.have.status(201);",
+                            "});",
+                            "const pokemon = pm.response.json();",
+                            "pm.collectionVariables.set(\"pokemonId\", String(pokemon.id));",
+                            "pm.test(\"Pokemon creado\", function () {",
+                            "    pm.expect(pokemon.nombre).to.eql(\"Pikachu\");",
+                            "    pm.expect(pokemon.id).to.be.a(\"number\");",
+                            "});"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Obtener todos",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/pokemones",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "pokemones"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Estado 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "pm.test(\"Lista de pokemones\", function () {",
+                            "    pm.expect(pm.response.json()).to.be.an(\"array\");",
+                            "});"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Obtener por ID",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/pokemones/{{pokemonId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "pokemones",
+                        "{{pokemonId}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Estado 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "pm.test(\"ID correcto\", function () {",
+                            "    pm.expect(String(pm.response.json().id)).to.eql(pm.collectionVariables.get(\"pokemonId\"));",
+                            "});"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Actualizar Pokemon",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/pokemones/{{pokemonId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "pokemones",
+                        "{{pokemonId}}"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"nombre\": \"Pikachu\",\n    \"tipo\": \"Electrico\",\n    \"nivel\": 20,\n    \"ataque\": 65,\n    \"defensa\": 50,\n    \"descripcion\": \"Pikachu entrenado\",\n    \"imagenUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Estado 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "pm.test(\"Datos actualizados\", function () {",
+                            "    pm.expect(pm.response.json().nivel).to.eql(20);",
+                            "    pm.expect(pm.response.json().ataque).to.eql(65);",
+                            "});"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Actualizar nivel",
+            "request": {
+                "method": "PATCH",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/pokemones/{{pokemonId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "pokemones",
+                        "{{pokemonId}}"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"nivel\": 25\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Estado 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "pm.test(\"Solo cambia el nivel\", function () {",
+                            "    const pokemon = pm.response.json();",
+                            "    pm.expect(pokemon.nivel).to.eql(25);",
+                            "    pm.expect(pokemon.nombre).to.eql(\"Pikachu\");",
+                            "    pm.expect(pokemon.ataque).to.eql(65);",
+                            "});"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Eliminar Pokemon",
+            "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/pokemones/{{pokemonId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "pokemones",
+                        "{{pokemonId}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Estado 204\", function () {",
+                            "    pm.response.to.have.status(204);",
+                            "});"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Verificar eliminacion",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/pokemones/{{pokemonId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "pokemones",
+                        "{{pokemonId}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test(\"Estado 404\", function () {",
+                            "    pm.response.to.have.status(404);",
+                            "});"
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
